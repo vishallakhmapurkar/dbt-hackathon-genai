@@ -1,0 +1,36 @@
+name: dbt CI Self-Heal
+
+on:
+  pull_request:
+    branches:
+      - '*'
+
+jobs:
+  run_dbt_on_pr:
+    name: dbt CI with Self-Heal
+    runs-on: ubuntu-latest
+
+    env:
+     ... removed env variables for brevity
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        repository: ${{ github.event.pull_request.head.repo.full_name }}
+        ref: ${{ github.event.pull_request.head.ref }}
+
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r ./python/requirements.txt
+
+    - name: Trigger dbt job
+      run: |
+        python -u ./python/run_monitor_and_self_heal.py
+
+F
